@@ -1,0 +1,135 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Diplomat",
+    "version": "2021-11-10",
+    "license": {
+      "name": "OCF Data Model License",
+      "url": "https://github.com/openconnectivityfoundation/core/blob/master/LICENSE.md",
+      "x-copyright": "Copyright 2021 Open Connectivity Foundation, Inc. All rights reserved."
+    },
+    "termsOfService": "https://openconnectivityfoundation.github.io/core/DISCLAIMER.md"
+  },
+  "schemes": ["http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/DiplomatResURI" : {
+      "get": {
+        "description": "This Resource describes a Diplomat used for Streamlined Onboarding. A Diplomat is used to transfer OCF information from a non-OCF out of band channel to an OBT.\nThe",
+        "parameters": [
+          {"$ref": "#/parameters/interface"}
+        ],
+        "responses": {
+          "200": {
+            "description" : "",
+            "x-example":
+            {
+              "rt": ["oic.r.diplomat"],
+              "if": ["oic.if.a", "oic.if.baseline"],
+              "soinfo": [
+                {
+                  "uuid": "",
+                  "creds": [
+                    {
+                      "oxm": 6,
+                      "cred": {
+                        "credid": 20044,
+                        "credtype": 16,
+                        "privatedata": {
+                          "encoding": "oic.sec.encoding.raw",
+                          "data": "010c78556a682ae1ad661743f2a165dc"
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "schema": { "$ref": "#/definitions/Diplomat" }
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "interface" : {
+      "in": "query",
+      "name": "if",
+      "type": "string",
+      "enum": ["oic.if.a", "oic.if.baseline"]
+    }
+  },
+  "definitions": {
+    "SoCreds": {
+      "description": "An instance of a credential that may be used for Streamlined Onboarding. Each credential includes the ownership transfer method that should be performed with it.",
+      "properties": {
+        "oxm": {
+          "description": "The Device owner transfer method that should be performed with this credential.",
+          "type": "integer"
+        },
+        "cred": { "$ref": "https://openconnectivityfoundation.github.io/security/swagger2.0/oic.sec.cred.swagger.json#/definitions/Cred/properties/creds/items" }
+      },
+      "required": ["oxm", "cred"],
+      "type": "object"
+    },
+    "SoInfo": {
+      "description": "An instance of Streamlined Onboarding information, which is used to identify and authenticate a Device during Onboarding. The identification takes the form of the Device's UUID, and the authentication comes from a credential. The Device may send more than one credential, each associated with an owner transfer method that should be performed with the credential.",
+      "properties": {
+        "uuid": { "$ref": "http://openconnectivityfoundation.github.io/core/schemas/oic.types-schema.json#/definitions/uuid" },
+        "creds": {
+          "description": "A collection of OCF credentials that the Device provides so that an OBT can select which credential to use for ownership transfer.",
+          "type": "array",
+          "items": { "$ref": "#/definitions/SoCreds" },
+          "minItems": 1
+        }
+      },
+      "type": "object",
+      "required": ["uuid", "creds"]
+    },
+    "Diplomat" : {
+      "properties": {
+        "rt": {
+          "description": "The Resource Type.",
+          "items": {
+            "enum": ["oic.r.diplomat"],
+            "maxLength": 64,
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true,
+          "readOnly": true,
+          "type": "array"
+        },
+        "n": {
+          "$ref": "https://openconnectivityfoundation.github.io/core/schemas/oic.common.properties.core-schema.json#/definitions/n"
+        },
+        "id": {
+          "$ref": "https://openconnectivityfoundation.github.io/core/schemas/oic.common.properties.core-schema.json#/definitions/id"
+        },
+        "if": {
+          "description": "The OCF Interface set supported by this Resource.",
+          "items": {
+            "enum": [
+              "oic.if.r",
+              "oic.if.baseline"
+            ],
+            "type": "string"
+          },
+          "minItems": 2,
+          "uniqueItems": true,
+          "readOnly": true,
+          "type": "array"
+        },
+        "soinfo": {
+          "description": "A collection of Streamlined Onboarding information provided by a Physical Device over an Out of Band Channel. Each entry contains information for an OCF Device that can be used to identify and authenticate the Device.",
+          "type": "array",
+          "items": { "$ref": "#/definitions/SoInfo" },
+          "readOnly": true
+        }
+      },
+      "type": "object",
+      "required": ["soinfo"]
+    }
+  }
+}
